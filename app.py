@@ -400,7 +400,7 @@ class AppHandler(BaseHTTPRequestHandler):
         # Avoid logging request contents or environment values.
         return
 
-
+handler = AppHandler
 if __name__ == "__main__":
     load_project_env()
     if not os.environ.get("SARVAM_API_KEY"):
