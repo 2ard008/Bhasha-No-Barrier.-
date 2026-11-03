@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7f4">
+  <title>Bhasha No barrier — doubt solver</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f8f7f4;
+      --white: #fff;
+      --ink: #202321;
+      --muted: #858a84;
+      --line: #ecece7;
+      --green: #244d3e;
+      --green-2: #376c55;
+      --mint: #e9f3ec;
+      --lime: #d8ef9b;
+      --orange: #ed8b55;
+      --orange-pale: #fff1e9;
+      --lavender: #eeebfa;
+      --shadow: 0 24px 70px rgba(30, 46, 36, .07);
+      --topic-accent: #244d3e;
+      --topic-soft: #e9f3ec;
+      --topic-glow: #e7efe6;
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --paper: #151b18;
+      --white: #202824;
+      --ink: #edf1ec;
+      --muted: #a2aaa3;
+      --line: #303a34;
+      --green: #244d3e;
+      --green-2: #9bc9a7;
+      --mint: #2d4237;
+      --lime: #d8ef9b;
+      --orange-pale: #3a2b22;
+      --lavender: #302c40;
+      --shadow: 0 24px 70px rgba(0, 0, 0, .24);
+      --topic-accent: #244d3e;
+      --topic-soft: #2d4237;
+      --topic-glow: #1d2c23;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(ellipse at 82% 5%, var(--topic-glow), transparent 43%), var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; transition: background-color .3s, color .3s; }
+    :root[data-topic="mathematics"] { --topic-accent: #55488f; --topic-soft: #efecfb; --topic-glow: #e8e2fb; }
+    :root[data-topic="science"] { --topic-accent: #28645d; --topic-soft: #e8f4f0; --topic-glow: #dff0e9; }
+    :root[data-topic="language"] { --topic-accent: #8a5267; --topic-soft: #f8eaf0; --topic-glow: #f5e2eb; }
+    :root[data-topic="social_studies"] { --topic-accent: #80602e; --topic-soft: #f7f0df; --topic-glow: #f2e9d6; }
+    :root[data-topic="technology"] { --topic-accent: #355e88; --topic-soft: #e9f0f8; --topic-glow: #dfeaf7; }
+    :root[data-topic="everyday_life"] { --topic-accent: #975d4c; --topic-soft: #f8eee8; --topic-glow: #f4e5dc; }
+    :root[data-theme="dark"][data-topic="mathematics"] { --topic-accent: #493e70; --topic-soft: #302a44; --topic-glow: #2a2540; }
+    :root[data-theme="dark"][data-topic="science"] { --topic-accent: #254f4c; --topic-soft: #263a37; --topic-glow: #1c3430; }
+    :root[data-theme="dark"][data-topic="language"] { --topic-accent: #68404f; --topic-soft: #3c2b33; --topic-glow: #39242e; }
+    :root[data-theme="dark"][data-topic="social_studies"] { --topic-accent: #624a26; --topic-soft: #3b3327; --topic-glow: #382e1d; }
+    :root[data-theme="dark"][data-topic="technology"] { --topic-accent: #2c4d6d; --topic-soft: #29343f; --topic-glow: #1d2e40; }
+    :root[data-theme="dark"][data-topic="everyday_life"] { --topic-accent: #70463a; --topic-soft: #3d302b; --topic-glow: #382821; }
+    button, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    .app { max-width: 1540px; margin: 0 auto; min-height: 100vh; padding: 0 34px 30px; }
+    .topbar { height: 82px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; color: inherit; }
+    .brand-mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 13px; color: var(--white); background: var(--green); box-shadow: 0 5px 12px #244d3e25; }
+    .brand-name { font-size: 17px; font-weight: 750; letter-spacing: -.04em; }
+    .brand-sub { margin-top: 2px; color: var(--muted); text-transform: uppercase; letter-spacing: .13em; font-size: 9px; font-weight: 700; }
+    .top-actions { display: flex; align-items: center; gap: 16px; }
+    .theme-toggle { height: 37px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 11px; border: 1px solid var(--line); border-radius: 11px; background: var(--white); color: var(--ink); font-size: 11px; font-weight: 650; transition: border-color .15s, background .15s; }
+    .theme-toggle:hover { border-color: #9fb8a3; }
+    .privacy { display: flex; align-items: center; gap: 7px; color: #69736b; font-size: 12px; }
+    .privacy svg { color: var(--green-2); }
+    .language { height: 37px; border: 1px solid var(--line); color: #3e4740; background: var(--white); border-radius: 11px; padding: 0 30px 0 11px; font-size: 12px; outline: none; }
+    .new-session { display: flex; align-items: center; gap: 8px; height: 39px; background: var(--green); color: white; border: 0; border-radius: 12px; padding: 0 14px; font-size: 12px; font-weight: 650; transition: transform .18s, background .18s; }
+    .new-session:hover { background: #1b3d31; transform: translateY(-1px); }
+    .layout { display: grid; grid-template-columns: 226px minmax(400px, 1fr) 285px; gap: 28px; padding-top: 27px; align-items: start; }
+    .left-rail { padding: 18px 7px 0 0; }
+    .eyebrow { color: #92968f; font-size: 10px; text-transform: uppercase; letter-spacing: .15em; font-weight: 750; }
+    .rail-title { margin: 10px 0 23px; font-size: 18px; line-height: 1.3; letter-spacing: -.045em; font-weight: 680; }
+    .rail-label { margin: 0 0 11px 8px; color: #a1a49e; font-size: 10px; font-weight: 750; text-transform: uppercase; letter-spacing: .12em; }
+    .nav-item { width: 100%; display: flex; align-items: center; gap: 11px; padding: 11px 10px; margin: 0 0 5px; border: 0; text-align: left; background: transparent; color: #606761; font-size: 12px; border-radius: 11px; }
+    .nav-item.active { color: var(--topic-accent); background: var(--topic-soft); font-weight: 700; }
+    .nav-item:hover { background: var(--topic-soft); }
+    .mobile-tabs { display: none; }
+    .nav-icon { width: 18px; height: 18px; display: grid; place-items: center; }
+    .rail-card { margin-top: 30px; border-radius: 17px; padding: 16px; background: #f0eee7; position: relative; overflow: hidden; }
+    .rail-card::after { content: ""; width: 86px; height: 86px; position: absolute; right: -34px; bottom: -43px; border: 1px solid #d3d1c6; border-radius: 50%; box-shadow: 0 0 0 11px #f0eee7, 0 0 0 12px #d3d1c6, 0 0 0 24px #f0eee7, 0 0 0 25px #d3d1c6; }
+    .rail-card-title { margin: 0 0 7px; font-size: 12px; font-weight: 720; }
+    .rail-card-copy { margin: 0; max-width: 155px; color: #747970; font-size: 11px; line-height: 1.6; }
+    .center { min-width: 0; }
+    .hero { position: relative; overflow: hidden; min-height: 176px; border-radius: 23px; padding: 29px 32px; background: var(--topic-accent); color: white; display: flex; align-items: center; justify-content: space-between; transition: background .3s; }
+    .hero::before { content: ""; position: absolute; width: 300px; height: 300px; right: -27px; top: -173px; border: 1px solid #ffffff18; border-radius: 50%; box-shadow: 0 0 0 22px var(--topic-accent), 0 0 0 23px #ffffff12, 0 0 0 52px var(--topic-accent), 0 0 0 53px #ffffff12; }
+    .hero::after { content: ""; position: absolute; width: 95px; height: 95px; border-radius: 26px; background: var(--lime); opacity: .95; right: 110px; bottom: -67px; transform: rotate(25deg); }
+    .hero-copy { position: relative; z-index: 1; max-width: 530px; }
+    .hero-kicker { display: flex; align-items: center; gap: 7px; color: #d6e7d9; font-size: 10px; text-transform: uppercase; letter-spacing: .13em; font-weight: 700; }
+    .hero-kicker span { width: 6px; height: 6px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 4px #d8ef9b25; }
+    .hero h1 { margin: 14px 0 9px; font-size: clamp(28px, 3.1vw, 42px); line-height: 1.04; letter-spacing: -.06em; font-weight: 640; }
+    .hero h1 em { color: var(--lime); font-style: normal; }
+    .hero p { margin: 0; color: #d3e0d6; font-size: 12px; line-height: 1.65; }
+    .hero-art { z-index: 1; position: relative; width: 95px; height: 95px; margin-right: 43px; display: grid; place-items: center; color: #e5f5c4; }
+    .hero-art::before { content: ""; width: 76px; height: 76px; position: absolute; border-radius: 50%; background: #ffffff11; }
+    .hero-art svg { position: relative; filter: drop-shadow(0 8px 8px #11291d44); }
+    .workbench { margin-top: 19px; border: 1px solid #ecebe6; border-radius: 22px; background: var(--white); box-shadow: var(--shadow); overflow: hidden; }
+    .bench-head { height: 61px; padding: 0 21px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0f0eb; }
+    .bench-title { display: flex; gap: 9px; align-items: center; font-size: 12px; font-weight: 700; }
+    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--topic-accent); box-shadow: 0 0 0 4px var(--topic-soft); }
+    .bench-note { color: #9b9f99; font-size: 10px; }
+    .thread { min-height: 216px; max-height: 460px; overflow-y: auto; padding: 21px 23px 6px; scroll-behavior: smooth; }
+    .welcome { display: flex; gap: 12px; max-width: 515px; margin-bottom: 19px; }
+    .tutor-avatar { flex: 0 0 31px; height: 31px; display: grid; place-items: center; border-radius: 11px; background: var(--mint); color: var(--green); }
+    .message { margin-bottom: 16px; display: flex; gap: 11px; align-items: flex-start; animation: rise .22s ease-out; }
+    @keyframes rise { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .bubble-wrap { max-width: min(590px, 85%); }
+    .message-meta { margin: 0 0 6px 1px; color: #9a9f99; font-size: 10px; font-weight: 650; }
+    .bubble { padding: 12px 15px; border-radius: 4px 15px 15px 15px; background: #f3f5f1; color: #39413b; font-size: 12px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .message.user { justify-content: flex-end; }
+    .message.user .bubble-wrap { display: flex; flex-direction: column; align-items: flex-end; }
+    .message.user .message-meta { margin-right: 2px; }
+    .message.user .bubble { border-radius: 15px 4px 15px 15px; background: var(--green); color: white; }
+    .typing { color: #7e877f; font-size: 11px; padding: 10px 0; }
+    .suggestions { padding: 0 23px 18px 65px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .suggestion { border: 1px solid #e7e9e3; background: #fff; color: #59645b; border-radius: 99px; font-size: 10px; padding: 8px 11px; transition: all .15s; }
+    .suggestion:hover { border-color: #b7ccba; color: var(--green); background: #f6faf5; }
+    .composer { padding: 0 19px 18px; }
+    .compose-box { position: relative; border: 1px solid #e7e9e3; border-radius: 15px; background: #fbfbf9; padding: 12px 13px 10px; transition: border-color .15s, box-shadow .15s; }
+    .compose-box:focus-within { border-color: #a8c4ae; box-shadow: 0 0 0 3px #eaf3ec; }
+    .compose-box textarea { width: 100%; min-height: 56px; resize: vertical; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 12px; line-height: 1.6; padding: 0 0 9px; }
+    .compose-box textarea::placeholder { color: #a4a8a2; }
+    .compose-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .compose-hint { color: #9da19a; font-size: 10px; }
+    .send { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 10px; padding: 9px 13px; background: var(--orange); color: white; font-size: 11px; font-weight: 700; box-shadow: 0 4px 9px #ed8b552a; transition: background .16s, transform .16s; }
+    .send:hover { background: #d87844; transform: translateY(-1px); }
+    .send:disabled { opacity: .55; cursor: wait; transform: none; }
+    .compose-tools { display: flex; align-items: center; gap: 8px; }
+    .voice-button { display: inline-flex; align-items: center; gap: 6px; min-height: 35px; padding: 0 10px; border: 1px solid #e5e8e1; border-radius: 10px; background: var(--white); color: #59645b; font-size: 10px; font-weight: 650; }
+    .voice-button:hover { border-color: #b7ccba; color: var(--green-2); }
+    .voice-button.listening { color: #a84d3a; border-color: #e8ad9c; background: #fff2ed; }
+    .error { margin: 10px 2px 0; color: #b9503b; font-size: 11px; }
+    .voice-disclosure { margin: 8px 2px 0; color: #9da19a; font-size: 9px; line-height: 1.4; }
+    .right-rail { padding-top: 3px; }
+    .profile-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+    .profile-title { margin: 5px 0 0; font-size: 17px; letter-spacing: -.04em; font-weight: 680; }
+    .profile-mark { width: 33px; height: 33px; display: grid; place-items: center; border-radius: 11px; color: #718558; background: #eef1dc; }
+    .profile-card { border: 1px solid #ecece7; border-radius: 17px; background: white; padding: 16px; margin-bottom: 12px; }
+    .card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 13px; font-size: 11px; font-weight: 720; }
+    .card-head svg { color: var(--green-2); }
+    .profile-empty { margin: 0; font-size: 11px; color: #9a9e98; line-height: 1.55; }
+    .chip-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .profile-chip { color: #506755; background: #f0f5ee; border-radius: 8px; padding: 6px 8px; font-size: 10px; line-height: 1.35; }
+    .profile-chip.pattern { color: #91684e; background: #fff3e9; }
+    .history-list { display: grid; gap: 12px; }
+    .history-item { border-left: 2px solid #dce5d8; padding-left: 10px; }
+    .history-concept { color: #747b72; font-size: 9px; text-transform: uppercase; letter-spacing: .08em; font-weight: 750; }
+    .history-copy { margin-top: 4px; color: #626a61; font-size: 10px; line-height: 1.45; }
+    .privacy-card { border-radius: 15px; padding: 14px; background: #f0eee7; display: flex; gap: 9px; color: #667064; }
+    .privacy-card svg { flex: 0 0 auto; color: #71865c; }
+    .privacy-card strong { display: block; margin: 0 0 4px; color: #474f46; font-size: 10px; }
+    .privacy-card p { margin: 0; font-size: 10px; line-height: 1.5; }
+    .footer { padding: 21px 0 0; display: flex; justify-content: space-between; color: #a4a69f; font-size: 9px; }
+    .footer-mark { display: flex; align-items: center; gap: 5px; }
+    .view-panel[hidden] { display: none !important; }
+    .mobile-tabs .nav-item { justify-content: center; margin: 0; white-space: nowrap; }
+    .view-heading { margin: 5px 0 20px; }
+    .view-heading h1 { margin: 7px 0 6px; font-size: 29px; letter-spacing: -.055em; }
+    .view-heading p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .listing-card { border: 1px solid var(--line); border-radius: 18px; padding: 17px; background: var(--white); box-shadow: var(--shadow); }
+    .history-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; color: var(--muted); font-size: 11px; }
+    .session-list { display: grid; gap: 9px; }
+    .session-row { width: 100%; padding: 14px 15px; display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; text-align: left; border: 1px solid var(--line); border-radius: 13px; background: var(--white); color: var(--ink); transition: border .15s, transform .15s; }
+    .session-row:hover { border-color: var(--topic-accent); transform: translateY(-1px); }
+    .session-title { font-size: 12px; font-weight: 680; }
+    .session-meta { display: flex; gap: 9px; align-items: center; color: var(--muted); font-size: 10px; }
+    .topic-pill { justify-self: end; align-self: center; border-radius: 99px; padding: 6px 9px; color: var(--topic-accent); background: var(--topic-soft); font-size: 9px; font-weight: 700; }
+    .empty-state { padding: 34px 16px; text-align: center; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .category-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+    .category-card { position: relative; min-height: 130px; border: 1px solid var(--line); border-radius: 16px; padding: 15px; background: var(--white); text-align: left; color: var(--ink); transition: transform .16s, border .16s, box-shadow .16s; }
+    .category-card:hover { transform: translateY(-2px); border-color: var(--topic-accent); box-shadow: var(--shadow); }
+    .category-symbol { width: 31px; height: 31px; display: grid; place-items: center; margin-bottom: 10px; border-radius: 10px; background: var(--topic-soft); color: var(--topic-accent); font-size: 16px; font-weight: 750; }
+    .category-name { display: block; font-size: 12px; font-weight: 720; }
+    .category-copy { display: block; margin-top: 5px; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .category-count { position: absolute; right: 12px; top: 12px; color: var(--muted); font-size: 9px; }
+    .message-extras { width: min(560px, 100%); margin: 9px 0 0; display: grid; gap: 9px; }
+    .visual-card, .connection-card, .practice-card { border: 1px solid var(--line); border-radius: 14px; background: var(--white); padding: 12px 14px; }
+    .extra-title { margin: 0 0 7px; color: var(--topic-accent); font-size: 10px; font-weight: 750; text-transform: uppercase; letter-spacing: .08em; }
+    .concept-diagram { display: block; width: 100%; height: 104px; overflow: visible; }
+    .diagram-label { fill: var(--ink); font: 9px Inter, system-ui, sans-serif; text-anchor: middle; }
+    .diagram-line { stroke: var(--topic-accent); stroke-width: 2; fill: none; stroke-linecap: round; }
+    .diagram-node { stroke: var(--topic-accent); stroke-width: 1.5; fill: var(--topic-soft); }
+    .diagram-strong { fill: var(--topic-accent); stroke: var(--topic-accent); }
+    .visual-caption { margin: 3px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .connection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .connection-card p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.55; }
+    .practice-list { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; counter-reset: practice; }
+    .practice-item { counter-increment: practice; display: grid; grid-template-columns: 22px 1fr; gap: 7px; color: var(--ink); font-size: 11px; line-height: 1.5; }
+    .practice-item::before { content: counter(practice, decimal-leading-zero); color: var(--topic-accent); font-size: 9px; font-weight: 750; padding-top: 2px; }
+    :root[data-theme="dark"] body { background: var(--paper); }
+    :root[data-theme="dark"] .rail-card { background: #242b26; }
+    :root[data-theme="dark"] .rail-card::after { border-color: #39443d; box-shadow: 0 0 0 11px #242b26, 0 0 0 12px #39443d, 0 0 0 24px #242b26, 0 0 0 25px #39443d; }
+    :root[data-theme="dark"] .rail-card-copy,
+    :root[data-theme="dark"] .nav-item { color: #aeb7af; }
+    :root[data-theme="dark"] .nav-item.active { color: #d7eadb; background: #2c4034; }
+    :root[data-theme="dark"] .bench-head { border-color: var(--line); }
+    :root[data-theme="dark"] .bubble { background: #2b342e; color: #e0e8e0; }
+    :root[data-theme="dark"] .suggestion { border-color: #39443d; background: #232c27; color: #c4cec5; }
+    :root[data-theme="dark"] .suggestion:hover { border-color: #688771; background: #2b3930; color: #e0eee2; }
+    :root[data-theme="dark"] .compose-box { border-color: #39443d; background: #1c231f; }
+    :root[data-theme="dark"] .compose-box:focus-within { border-color: #789a7f; box-shadow: 0 0 0 3px #2a3930; }
+    :root[data-theme="dark"] .voice-button { border-color: #39443d; color: #d0d8d0; }
+    :root[data-theme="dark"] .voice-button.listening { color: #ffc1ad; border-color: #885344; background: #3c2d28; }
+    :root[data-theme="dark"] .profile-card { border-color: var(--line); }
+    :root[data-theme="dark"] .profile-chip { color: #cce2ce; background: #2a3a2e; }
+    :root[data-theme="dark"] .profile-chip.pattern { color: #efc6a5; background: #3b3026; }
+    :root[data-theme="dark"] .history-item { border-color: #506650; }
+    :root[data-theme="dark"] .history-copy,
+    :root[data-theme="dark"] .history-concept { color: #b8c2b9; }
+    :root[data-theme="dark"] .privacy-card { background: #242b26; color: #b8c2b8; }
+    :root[data-theme="dark"] .privacy-card strong { color: #e0e8df; }
+    :root[data-theme="dark"] .profile-mark { color: #d2e1ae; background: #343c2b; }
+    :root[data-theme="dark"] .nav-item { color: #aeb7af; }
+    :root[data-theme="dark"] .nav-item.active { color: #e4e9dc; }
+    @media (max-width: 1120px) { .layout { grid-template-columns: 180px minmax(360px, 1fr); gap: 20px; } .right-rail { grid-column: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; } .profile-head { grid-column: 1 / -1; margin-bottom: 0; } .privacy-card { grid-column: 1 / -1; } }
+    @media (max-width: 760px) { .app { padding: 0 15px 22px; } .topbar { height: 68px; } .privacy { display: none; } .mobile-tabs { display: flex; gap: 4px; overflow-x: auto; padding: 9px 0 0; border-bottom: 1px solid var(--line); } .mobile-tabs .nav-item { width: auto; padding: 9px 10px; font-size: 10px; } .layout { display: flex; flex-direction: column; gap: 18px; padding-top: 16px; } .left-rail { display: none; } .center, .right-rail { width: 100%; } .hero { min-height: 165px; padding: 24px 22px; } .hero-art { margin-right: 5px; transform: scale(.82); } .hero p { max-width: 300px; } .workbench { margin-top: 13px; } .right-rail { display: grid; grid-template-columns: 1fr 1fr; } .profile-head { grid-column: 1 / -1; } .privacy-card { grid-column: 1 / -1; } .bench-note { display: none; } .thread { padding: 19px 16px 5px; } .suggestions { padding-left: 57px; padding-right: 14px; } .composer { padding: 0 13px 14px; } .footer { padding-top: 6px; } }
+    @media (max-width: 430px) { .brand-sub { display: none; } .brand-name { font-size: 13px; } .top-actions { gap: 6px; } .theme-toggle { width: 35px; padding: 0; } .theme-toggle span { display: none; } .language { max-width: 70px; padding-left: 8px; padding-right: 20px; } .new-session { padding: 0 10px; font-size: 0; gap: 0; width: 39px; justify-content: center; } .compose-hint { display: none; } .hero-art { display: none; } .hero h1 { font-size: 31px; } .right-rail { grid-template-columns: 1fr; } .profile-head, .privacy-card { grid-column: 1; } }
+    @media (max-width: 560px) { .category-grid { grid-template-columns: 1fr; } .connection-grid { grid-template-columns: 1fr; } .view-heading h1 { font-size: 25px; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Bhasha home">
+        <span class="brand-mark"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.5 5.2c3.4-.8 6.2-.2 8.5 1.5v13c-2.3-1.7-5.1-2.3-8.5-1.5v-13Zm17 0c-3.4-.8-6.2-.2-8.5 1.5v13c2.3-1.7 5.1-2.3 8.5-1.5v-13Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/><path d="M7 9.5c1.3-.1 2.3.1 3.2.6M17 9.5c-1.3-.1-2.3.1-3.2.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+        <span><span class="brand-name">Bhasha No barrier</span><span class="brand-sub" style="display:block">doubt solver</span></span>
+      </a>
+      <div class="top-actions">
+        <div class="privacy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3 5 6v5c0 4.7 2.9 8.1 7 10 4.1-1.9 7-5.3 7-10V6l-7-3Z" stroke="currentColor" stroke-width="1.7"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Your learning map is saved on this device</div>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode"><svg id="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span id="theme-label">Dark</span></button>
+        <select id="language" class="language" aria-label="Reply language"><option>English</option><option>हिन्दी</option><option>Hinglish</option><option>தமிழ்</option><option>తెలుగు</option><option>বাংলা</option><option>मराठी</option></select>
+        <button class="new-session" id="new-session" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>New doubt</button>
+      </div>
+    </header>
+
+    <nav class="mobile-tabs" aria-label="Learning sections">
+      <button class="nav-item active" type="button" data-view="ask">Ask a doubt</button>
+      <button class="nav-item" type="button" data-view="history">Doubt history</button>
+      <button class="nav-item" type="button" data-view="categories">Categories</button>
+    </nav>
+
+    <main class="layout">
+      <aside class="left-rail">
+        <div class="eyebrow">Your learning space</div>
+        <h2 class="rail-title">Curiosity looks<br>good on you.</h2>
+        <div class="rail-label">Today</div>
+        <button class="nav-item active" type="button" data-view="ask"><span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 5h16v11H8l-4 3V5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 9h8M8 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>Ask a doubt</button>
+        <button class="nav-item" type="button" data-view="history"><span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 19.5V5.8c0-.9.7-1.6 1.6-1.6H20v15H5.6c-.9 0-1.6.1-1.6.3Zm0 0c0-.9.7-1.6 1.6-1.6H20" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 8h8M8 11h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>Doubt history</button>
+        <button class="nav-item" type="button" data-view="categories"><span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="4" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="4" y="14" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="14" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/></svg></span>Categories</button>
+        <div class="rail-card"><p class="rail-card-title">Small steps, big shifts.</p><p class="rail-card-copy">You learn more when you can explain how you got there.</p></div>
+      </aside>
+
+      <section class="center" aria-label="Doubt solver">
+      <div id="ask-view" class="view-panel">
+        <div class="hero">
+          <div class="hero-copy"><div class="hero-kicker"><span></span> A little less stuck, a lot more sure</div><h1>Let's <em>think</em><br>it through.</h1><p>Bring the doubt you’re wrestling with. We’ll work through your thinking, one small step at a time.</p></div>
+          <div class="hero-art" aria-hidden="true"><svg width="75" height="75" viewBox="0 0 80 80" fill="none"><path d="M17 44c6-13 14-19 24-19 8 0 15 5 22 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 5"/><path d="M56 38c2 2 5 3 8 2-1 4-4 6-8 6" fill="#D8EF9B"/><circle cx="41" cy="26" r="5" fill="#D8EF9B"/><path d="M20 60c0-10 8-18 18-18h4c10 0 18 8 18 18v2H20v-2Z" fill="#E6F0D2"/><path d="M29 60v-7m22 7v-7" stroke="#244D3E" stroke-width="2" stroke-linecap="round"/><path d="M31 49c3 2 6 3 9 3s6-1 9-3" stroke="#244D3E" stroke-width="1.8" stroke-linecap="round"/><path d="m18 28 2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4Zm44-13 1.5 3.5L67 20l-3.5 1.5L62 25l-1.5-3.5L57 20l3.5-1.5L62 15Z" fill="#F6B58F"/></svg></div>
+        </div>
+        <div class="workbench">
+          <div class="bench-head"><div class="bench-title"><span class="live-dot"></span> Your thinking space</div><div class="bench-note">No rush. Show your working whenever you’re ready.</div></div>
+          <div id="thread" class="thread" aria-live="polite">
+            <div class="welcome"><span class="tutor-avatar"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3v2m0 14v2M4.2 4.2l1.4 1.4m12.8 12.8 1.4 1.4M3 12h2m14 0h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.6"/></svg></span><div class="bubble-wrap"><div class="message-meta">Bhasha · your learning buddy</div><div class="bubble">Hi! What are you working on? Share the question, and we’ll start with how you’re thinking about it.</div></div></div>
+          </div>
+          <div class="suggestions" id="suggestions"><button class="suggestion" type="button">Why is a negative × negative positive?</button><button class="suggestion" type="button">I keep mixing up area and perimeter</button><button class="suggestion" type="button">Can you help me understand fractions?</button></div>
+          <form class="composer" id="composer">
+            <div class="compose-box"><textarea id="message" rows="2" placeholder="Type your doubt, or tell me what you’ve tried…" aria-label="Your doubt or reasoning"></textarea><div class="compose-bottom"><span class="compose-hint">A rough thought is a great place to start.</span><div class="compose-tools"><button id="voice-input" class="voice-button" type="button" aria-label="Speak your doubt" title="Speak your doubt"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3m-3 0h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span id="voice-label">Speak</span></button><button id="send" class="send" type="submit">Let’s work it out <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div></div></div><div class="error" id="error" role="status" hidden></div><div class="voice-disclosure">When you use Speak, a short recording is sent to Sarvam for transcription.</div>
+          </form>
+        </div>
+        <div class="footer"><span>Understanding first. Answers follow.</span><span class="footer-mark">Made for curious minds <span style="color:#ed8b55">✳</span></span></div>
+      </div>
+      <section id="history-view" class="view-panel" aria-label="Doubt history" hidden>
+        <div class="view-heading"><div class="eyebrow">Every question is progress</div><h1>Your doubt history</h1><p>Pick up an earlier thread, revisit a tough idea, or notice how your thinking has grown.</p></div>
+        <div class="listing-card"><div class="history-toolbar"><span id="history-count">Your recent learning sessions</span><button class="suggestion" id="refresh-history" type="button">Refresh</button></div><div id="session-list" class="session-list"><div class="empty-state">Your past doubts will appear here after your first conversation.</div></div></div>
+      </section>
+      <section id="categories-view" class="view-panel" aria-label="Doubt categories" hidden>
+        <div class="view-heading"><div class="eyebrow">Choose a path to explore</div><h1>What are you curious about?</h1><p>Pick a subject to start a guided doubt-solving session. Your learning map travels with you.</p></div>
+        <div id="category-grid" class="category-grid"></div>
+      </section>
+      </section>
+
+      <aside class="right-rail" aria-label="Learner profile">
+        <div class="profile-head"><div><div class="eyebrow">Growing with you</div><h2 class="profile-title">Your learning map</h2></div><span class="profile-mark"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 18V6m0 12h16M7 15l4-4 3 2 6-7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 6h4v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+        <div class="profile-card"><div class="card-head"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Zm6 12 .9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9L18 15Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Things you’re building</div><div id="strengths" class="chip-list"><p class="profile-empty">Your strengths will show up here as we learn together.</p></div></div>
+        <div class="profile-card"><div class="card-head"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 1 0 9 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M12 7v5l4 2m1-10h4v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Patterns we’re untangling</div><div id="patterns" class="chip-list"><p class="profile-empty">No assumptions here. We’ll notice patterns together.</p></div></div>
+        <div class="profile-card"><div class="card-head"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4z" stroke="currentColor" stroke-width="1.5"/><path d="M8 9h8M8 12h6M8 15h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Recent discoveries</div><div id="history" class="history-list"><p class="profile-empty">Your learning journey is just beginning.</p></div></div>
+        <div class="privacy-card"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3 5 6v5c0 4.7 2.9 8.1 7 10 4.1-1.9 7-5.3 7-10V6l-7-3Z" stroke="currentColor" stroke-width="1.6"/><path d="M9 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><div><strong>Your progress, remembered</strong><p>Your history is saved on this device. Relevant context goes to Sarvam with your question to shape future hints.</p></div></div>
+      </aside>
+    </main>
+  </div>
+  <script>
+    const thread = document.getElementById('thread');
+    const composer = document.getElementById('composer');
+    const input = document.getElementById('message');
+    const sendButton = document.getElementById('send');
+    const errorBox = document.getElementById('error');
+    const languageSelect = document.getElementById('language');
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeLabel = document.getElementById('theme-label');
+    const themeIcon = document.getElementById('theme-icon');
+    const voiceButton = document.getElementById('voice-input');
+    const voiceLabel = document.getElementById('voice-label');
+    let sessionId = localStorage.getItem('bhasha-session');
+    let hasMessages = false;
+
+    function setTheme(theme) {
+      const dark = theme === 'dark';
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      localStorage.setItem('bhasha-theme', dark ? 'dark' : 'light');
+      themeToggle.setAttribute('aria-pressed', String(dark));
+      themeToggle.setAttribute('aria-label', `Switch to ${dark ? 'light' : 'dark'} mode`);
+      themeToggle.title = `Switch to ${dark ? 'light' : 'dark'} mode`;
+      themeLabel.textContent = dark ? 'Light' : 'Dark';
+      themeIcon.innerHTML = dark
+        ? '<path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m17.5 3 .6 1.5 1.5.5-1.5.6-.6 1.5-.5-1.5-1.5-.6 1.5-.5.5-1.5Z" fill="currentColor"/>'
+        : '<circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>';
+    }
+    setTheme(localStorage.getItem('bhasha-theme') || 'light');
+    themeToggle.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+    languageSelect.value = localStorage.getItem('bhasha-language') || 'English';
+    languageSelect.addEventListener('change', () => localStorage.setItem('bhasha-language', languageSelect.value));
+
+    const categoryData = [
+      { key: 'mathematics', name: 'Mathematics', symbol: '∑', copy: 'Numbers, patterns, shapes and the logic between them.' },
+      { key: 'science', name: 'Science', symbol: '◌', copy: 'Life, matter, energy and the world around us.' },
+      { key: 'language', name: 'Language & literature', symbol: 'Aa', copy: 'Words, grammar, reading and finding your voice.' },
+      { key: 'social_studies', name: 'People & places', symbol: '⌖', copy: 'History, geography, civics and how societies work.' },
+      { key: 'technology', name: 'Technology', symbol: '⌘', copy: 'Computers, coding, digital systems and design.' },
+      { key: 'everyday_life', name: 'Everyday life', symbol: '✳', copy: 'Practical questions, money, time, cooking and more.' },
+      { key: 'general', name: 'Something else', symbol: '＋', copy: 'Curiosity doesn’t always fit in a box.' }
+    ];
+    const categoryName = (key) => categoryData.find((item) => item.key === key)?.name || 'Something else';
+    let selectedCategory = '';
+    function setTopicTheme(category) {
+      const safeCategory = categoryData.some((item) => item.key === category) ? category : 'general';
+      document.documentElement.dataset.topic = safeCategory;
+    }
+    function guessCategory(text) {
+      const query = text.toLowerCase();
+      if (/\b(fraction|algebra|equation|geometry|triangle|area|perimeter|number|multiply|divide|ratio|percent|math|probability|calculus|graph|angle)\b/.test(query)) return 'mathematics';
+      if (/\b(plant|animal|cell|atom|force|energy|gravity|chemical|biology|physics|chemistry|science|planet|ecosystem|photosynthesis)\b/.test(query)) return 'science';
+      if (/\b(grammar|verb|noun|essay|poem|metaphor|sentence|language|literature|spelling|reading|writing|story)\b/.test(query)) return 'language';
+      if (/\b(history|geography|government|civics|culture|society|empire|continent|climate|economics|map)\b/.test(query)) return 'social_studies';
+      if (/\b(code|coding|computer|program|algorithm|internet|software|robot|technology|digital|app)\b/.test(query)) return 'technology';
+      if (/\b(recipe|cooking|budget|money|tax|time|travel|shopping|daily|everyday|measure|weather)\b/.test(query)) return 'everyday_life';
+      return selectedCategory || 'general';
+    }
+    function showView(view) {
+      document.querySelectorAll('[data-view]').forEach((button) => button.classList.toggle('active', button.dataset.view === view));
+      document.querySelectorAll('.view-panel').forEach((panel) => { panel.hidden = panel.id !== `${view}-view`; });
+      if (view === 'history') loadSessions();
+      if (view === 'categories') loadSessions().then(renderCategories).catch(() => renderCategories([]));
+    }
+    document.querySelectorAll('[data-view]').forEach((button) => button.addEventListener('click', () => showView(button.dataset.view)));
+
+    function renderCategories(sessions = []) {
+      const grid = document.getElementById('category-grid');
+      grid.replaceChildren();
+      categoryData.forEach((category) => {
+        const count = sessions.filter((session) => session.category === category.key).length;
+        const button = document.createElement('button'); button.type = 'button'; button.className = 'category-card';
+        const tally = document.createElement('span'); tally.className = 'category-count'; tally.textContent = `${count} ${count === 1 ? 'doubt' : 'doubts'}`;
+        const symbol = document.createElement('span'); symbol.className = 'category-symbol'; symbol.textContent = category.symbol;
+        const name = document.createElement('span'); name.className = 'category-name'; name.textContent = category.name;
+        const copy = document.createElement('span'); copy.className = 'category-copy'; copy.textContent = category.copy;
+        button.append(tally, symbol, name, copy);
+        button.addEventListener('click', () => startNewSession(category.key));
+        grid.appendChild(button);
+      });
+    }
+
+    let mediaRecorder = null;
+    let mediaStream = null;
+    let recordingChunks = [];
+    let recordingTimer = null;
+    let listening = false;
+    let voiceStartText = '';
+    function setListening(active) {
+      listening = active;
+      voiceButton.classList.toggle('listening', active);
+      voiceLabel.textContent = active ? 'Stop' : 'Speak';
+      voiceButton.setAttribute('aria-label', active ? 'Stop voice recording' : 'Speak your doubt');
+      voiceButton.title = active ? 'Stop recording and transcribe' : 'Speak your doubt';
+    }
+    async function transcribeRecording(blob) {
+      voiceButton.disabled = true;
+      voiceLabel.textContent = 'Transcribing…';
+      try {
+        const bytes = new Uint8Array(await blob.arrayBuffer());
+        let binary = '';
+        for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+          binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
+        }
+        const response = await fetch('/api/transcribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ audio_base64: btoa(binary), mime_type: blob.type || 'audio/webm' })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Could not transcribe that recording.');
+        const transcript = (data.transcript || '').trim();
+        if (transcript) input.value = [voiceStartText, transcript].filter(Boolean).join(voiceStartText ? ' ' : '');
+        input.focus();
+      } catch (error) {
+        errorBox.textContent = error.message || 'I couldn’t transcribe that recording. Check your connection and try again.';
+        errorBox.hidden = false;
+      } finally {
+        voiceButton.disabled = false;
+        voiceLabel.textContent = 'Speak';
+      }
+    }
+    function stopRecording() {
+      if (recordingTimer) clearTimeout(recordingTimer);
+      recordingTimer = null;
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    }
+    voiceButton.addEventListener('click', async () => {
+      errorBox.hidden = true;
+      errorBox.textContent = '';
+      if (listening) { stopRecording(); return; }
+      if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+        errorBox.textContent = 'Voice recording is not supported in this browser. Try Chrome or Edge.';
+        errorBox.hidden = false;
+        return;
+      }
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        voiceStartText = input.value.trim();
+        recordingChunks = [];
+        const mimeType = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'].find((type) => MediaRecorder.isTypeSupported(type));
+        mediaRecorder = new MediaRecorder(mediaStream, mimeType ? { mimeType } : undefined);
+        mediaRecorder.ondataavailable = (event) => { if (event.data.size) recordingChunks.push(event.data); };
+        mediaRecorder.onstop = () => {
+          mediaStream?.getTracks().forEach((track) => track.stop());
+          mediaStream = null;
+          const blob = new Blob(recordingChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+          recordingChunks = [];
+          if (blob.size) transcribeRecording(blob);
+          else { voiceButton.disabled = false; voiceLabel.textContent = 'Speak'; }
+        };
+        mediaRecorder.start();
+        setListening(true);
+        recordingTimer = setTimeout(stopRecording, 25_000);
+      } catch (error) {
+        mediaStream?.getTracks().forEach((track) => track.stop());
+        mediaStream = null;
+        errorBox.textContent = error.name === 'NotAllowedError'
+          ? 'Allow microphone access in your browser to use voice typing.'
+          : 'Could not start the microphone. Check your device and try again.';
+        errorBox.hidden = false;
+      }
+    });
+
+    function svgNode(tag, attributes = {}) {
+      const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      Object.entries(attributes).forEach(([key, value]) => node.setAttribute(key, value));
+      return node;
+    }
+    function addSvgText(svg, x, y, value) {
+      const label = svgNode('text', { x, y, class: 'diagram-label' });
+      label.textContent = String(value || '').slice(0, 14);
+      svg.appendChild(label);
+    }
+    function makeDiagram(type, labels = []) {
+      const svg = svgNode('svg', { viewBox: '0 0 240 108', class: 'concept-diagram', role: 'img', 'aria-label': 'Concept diagram' });
+      const short = (index, fallback) => String(labels[index] || fallback).slice(0, 12);
+      if (type === 'number_line') {
+        svg.appendChild(svgNode('path', { d: 'M18 42H222m-7-5 7 5-7 5', class: 'diagram-line' }));
+        [42, 87, 132, 177].forEach((x, i) => { svg.appendChild(svgNode('path', { d: `M${x} 36v12`, class: 'diagram-line' })); addSvgText(svg, x, 66, short(i, ['−2', '−1', '0', '1'][i])); });
+        svg.appendChild(svgNode('circle', { cx: 132, cy: 42, r: 5, class: 'diagram-node diagram-strong' }));
+      } else if (type === 'parts_whole') {
+        [0, 1, 2, 3].forEach((i) => { svg.appendChild(svgNode('rect', { x: 24 + i * 48, y: 27, width: 46, height: 31, rx: 5, class: i < 2 ? 'diagram-node diagram-strong' : 'diagram-node' })); addSvgText(svg, 47 + i * 48, 78, short(i, `part ${i + 1}`)); });
+      } else if (type === 'cycle') {
+        svg.appendChild(svgNode('path', { d: 'M77 36 149 33M161 44l-28 40M113 83 72 50', class: 'diagram-line' }));
+        [[68, 34], [169, 31], [119, 85]].forEach(([cx, cy], i) => { svg.appendChild(svgNode('circle', { cx, cy, r: 20, class: 'diagram-node' })); addSvgText(svg, cx, cy + 3, short(i, `step ${i + 1}`)); });
+      } else if (type === 'flow') {
+        [0, 1, 2].forEach((i) => {
+          const x = 6 + i * 80;
+          svg.appendChild(svgNode('rect', { x, y: 31, width: 67, height: 38, rx: 10, class: 'diagram-node' }));
+          addSvgText(svg, x + 33, 54, short(i, `step ${i + 1}`));
+          if (i < 2) svg.appendChild(svgNode('path', { d: `M${x + 69} 50h8m-4-4 4 4-4 4`, class: 'diagram-line' }));
+        });
+      } else if (type === 'compare') {
+        svg.appendChild(svgNode('path', { d: 'M28 82H212', class: 'diagram-line' }));
+        svg.appendChild(svgNode('rect', { x: 54, y: 39, width: 48, height: 43, rx: 7, class: 'diagram-node diagram-strong' }));
+        svg.appendChild(svgNode('rect', { x: 138, y: 22, width: 48, height: 60, rx: 7, class: 'diagram-node' }));
+        addSvgText(svg, 78, 99, short(0, 'one idea')); addSvgText(svg, 162, 99, short(1, 'another'));
+      } else if (type === 'shapes') {
+        svg.appendChild(svgNode('circle', { cx: 49, cy: 45, r: 24, class: 'diagram-node diagram-strong' }));
+        svg.appendChild(svgNode('rect', { x: 95, y: 21, width: 48, height: 48, rx: 5, class: 'diagram-node' }));
+        svg.appendChild(svgNode('path', { d: 'm190 20 28 50h-56l28-50Z', class: 'diagram-node diagram-strong' }));
+        addSvgText(svg, 49, 91, short(0, 'circle')); addSvgText(svg, 119, 91, short(1, 'square')); addSvgText(svg, 190, 91, short(2, 'triangle'));
+      } else if (type === 'concept_map') {
+        svg.appendChild(svgNode('path', { d: 'M120 48 60 83m60-35 60 35', class: 'diagram-line' }));
+        [[120, 33, 42], [55, 84, 34], [185, 84, 34]].forEach(([cx, cy, r], i) => { svg.appendChild(svgNode('circle', { cx, cy, r, class: i === 0 ? 'diagram-node diagram-strong' : 'diagram-node' })); addSvgText(svg, cx, cy + 3, short(i, ['idea', 'part A', 'part B'][i])); });
+      }
+      return svg;
+    }
+    function appendMessageExtras(wrap, extras = {}) {
+      if (!extras || typeof extras !== 'object') return;
+      const visual = extras.visual || {};
+      const labels = Array.isArray(visual.labels) ? visual.labels.filter((item) => typeof item === 'string') : [];
+      const examples = Array.isArray(extras.examples) ? extras.examples.filter((item) => typeof item === 'string' && item.trim()) : [];
+      const future = Array.isArray(extras.future_uses) ? extras.future_uses.filter((item) => typeof item === 'string' && item.trim()) : [];
+      const questions = Array.isArray(extras.practice_questions) ? extras.practice_questions.filter((item) => typeof item === 'string' && item.trim()) : [];
+      if (visual.type && visual.type !== 'none') {
+        const card = document.createElement('div'); card.className = 'message-extras visual-card';
+        const heading = document.createElement('div'); heading.className = 'extra-title'; heading.textContent = visual.title || 'Picture the idea';
+        card.append(heading, makeDiagram(visual.type, labels));
+        if (visual.caption) { const caption = document.createElement('p'); caption.className = 'visual-caption'; caption.textContent = visual.caption; card.appendChild(caption); }
+        wrap.appendChild(card);
+      }
+      if (examples.length || future.length) {
+        const grid = document.createElement('div'); grid.className = 'message-extras connection-grid';
+        [[examples, 'In the world'], [future, 'Where it leads']].forEach(([items, headingText]) => {
+          if (!items.length) return;
+          const card = document.createElement('div'); card.className = 'connection-card';
+          const heading = document.createElement('div'); heading.className = 'extra-title'; heading.textContent = headingText;
+          const text = document.createElement('p'); text.textContent = items.slice(0, 2).join(' ');
+          card.append(heading, text); grid.appendChild(card);
+        });
+        wrap.appendChild(grid);
+      }
+      if (extras.mastery === 'ready_to_practice' && questions.length >= 4) {
+        const card = document.createElement('div'); card.className = 'message-extras practice-card';
+        const heading = document.createElement('div'); heading.className = 'extra-title'; heading.textContent = 'You’ve got the idea · try these next';
+        const list = document.createElement('ol'); list.className = 'practice-list';
+        questions.slice(0, 5).forEach((question) => {
+          const item = document.createElement('li'); item.className = 'practice-item'; item.textContent = question;
+          item.tabIndex = 0; item.setAttribute('role', 'button'); item.setAttribute('aria-label', `Try this practice question: ${question}`);
+          const useQuestion = () => { input.value = question; input.focus(); composer.scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+          item.addEventListener('click', useQuestion); item.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); useQuestion(); } });
+          list.appendChild(item);
+        });
+        card.append(heading, list); wrap.appendChild(card);
+      }
+    }
+
+    function addMessage(role, content, extras = {}) {
+      const row = document.createElement('div');
+      row.className = `message ${role === 'user' ? 'user' : 'assistant'}`;
+      if (role !== 'user') {
+        const avatar = document.createElement('span');
+        avatar.className = 'tutor-avatar';
+        avatar.textContent = '✳';
+        row.appendChild(avatar);
+      }
+      const wrap = document.createElement('div');
+      wrap.className = 'bubble-wrap';
+      const meta = document.createElement('div');
+      meta.className = 'message-meta';
+      meta.textContent = role === 'user' ? 'You' : 'Bhasha · learning with you';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = content;
+      wrap.append(meta, bubble);
+      if (role !== 'user') appendMessageExtras(wrap, extras);
+      row.appendChild(wrap);
+      thread.appendChild(row);
+      thread.scrollTop = thread.scrollHeight;
+    }
+
+    function renderProfile(profile = {}) {
+      const renderChips = (id, entries, empty, pattern = false) => {
+        const target = document.getElementById(id);
+        target.replaceChildren();
+        if (!entries || !entries.length) {
+          const note = document.createElement('p'); note.className = 'profile-empty'; note.textContent = empty; target.appendChild(note); return;
+        }
+        entries.slice(-6).forEach((entry) => {
+          const chip = document.createElement('span'); chip.className = `profile-chip${pattern ? ' pattern' : ''}`; chip.textContent = entry; target.appendChild(chip);
+        });
+      };
+      renderChips('strengths', profile.strengths, 'Your strengths will show up here as we learn together.');
+      renderChips('patterns', profile.patterns, 'No assumptions here. We’ll notice patterns together.', true);
+      const history = document.getElementById('history');
+      history.replaceChildren();
+      const discoveries = [...(profile.misconceptions || [])].reverse().slice(0, 3);
+      if (!discoveries.length) {
+        const note = document.createElement('p'); note.className = 'profile-empty'; note.textContent = 'Your learning journey is just beginning.'; history.appendChild(note); return;
+      }
+      discoveries.forEach((item) => {
+        const card = document.createElement('div'); card.className = 'history-item';
+        const title = document.createElement('div'); title.className = 'history-concept'; title.textContent = item.concept || 'A useful check-in';
+        const copy = document.createElement('div'); copy.className = 'history-copy'; copy.textContent = item.misconception;
+        card.append(title, copy); history.appendChild(card);
+      });
+    }
+
+    function showWelcome(text = 'Hi! What are you working on? Share the question, and we’ll start with how you’re thinking about it.') {
+      thread.replaceChildren();
+      const welcome = document.createElement('div'); welcome.className = 'welcome';
+      const avatar = document.createElement('span'); avatar.className = 'tutor-avatar'; avatar.textContent = '✳';
+      const wrap = document.createElement('div'); wrap.className = 'bubble-wrap';
+      const meta = document.createElement('div'); meta.className = 'message-meta'; meta.textContent = 'Bhasha · your learning buddy';
+      const bubble = document.createElement('div'); bubble.className = 'bubble'; bubble.textContent = text;
+      wrap.append(meta, bubble); welcome.append(avatar, wrap); thread.appendChild(welcome);
+    }
+
+    async function loadSessions() {
+      const response = await fetch('/api/sessions');
+      if (!response.ok) throw new Error('Could not load your doubt history.');
+      const data = await response.json();
+      const sessions = data.sessions || [];
+      const list = document.getElementById('session-list');
+      const count = document.getElementById('history-count');
+      count.textContent = `${sessions.length} ${sessions.length === 1 ? 'learning session' : 'learning sessions'}`;
+      list.replaceChildren();
+      if (!sessions.length) {
+        const empty = document.createElement('div'); empty.className = 'empty-state'; empty.textContent = 'Your past doubts will appear here after your first conversation.'; list.appendChild(empty);
+        return sessions;
+      }
+      sessions.forEach((session) => {
+        const row = document.createElement('button'); row.type = 'button'; row.className = 'session-row';
+        const title = document.createElement('span'); title.className = 'session-title'; title.textContent = session.title || 'Untitled doubt';
+        const pill = document.createElement('span'); pill.className = 'topic-pill'; pill.textContent = categoryName(session.category);
+        const meta = document.createElement('span'); meta.className = 'session-meta';
+        const date = document.createElement('span'); date.textContent = new Date(session.updated_at || session.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        const turns = document.createElement('span'); turns.textContent = `${Math.max(1, Math.ceil((session.message_count || 0) / 2))} ${Math.ceil((session.message_count || 0) / 2) === 1 ? 'exchange' : 'exchanges'}`;
+        meta.append(date, turns); row.append(title, pill, meta);
+        row.addEventListener('click', () => openSession(session.id));
+        list.appendChild(row);
+      });
+      return sessions;
+    }
+
+    async function openSession(id) {
+      try {
+        const response = await fetch(`/api/state?session_id=${encodeURIComponent(id)}`);
+        if (!response.ok) throw new Error('Could not reopen that doubt.');
+        const state = await response.json();
+        sessionId = state.session_id; localStorage.setItem('bhasha-session', sessionId);
+        selectedCategory = state.category || '';
+        setTopicTheme(selectedCategory);
+        renderProfile(state.profile);
+        thread.replaceChildren();
+        if (!state.messages.length) showWelcome();
+        state.messages.forEach((message) => addMessage(message.role, message.content, message.extras));
+        hasMessages = state.messages.length > 0;
+        document.getElementById('suggestions').hidden = hasMessages;
+        showView('ask');
+      } catch (error) {
+        errorBox.textContent = error.message || 'Could not reopen that doubt.'; errorBox.hidden = false;
+      }
+    }
+
+    async function startNewSession(category = '') {
+      try {
+        const response = await fetch('/api/state');
+        if (!response.ok) throw new Error('Could not start a new doubt.');
+        const state = await response.json();
+        sessionId = state.session_id; localStorage.setItem('bhasha-session', sessionId);
+        selectedCategory = category;
+        setTopicTheme(category || 'general');
+        renderProfile(state.profile);
+        showWelcome(category ? `Let’s explore ${categoryName(category)} together. What’s the question you’re curious about?` : undefined);
+        hasMessages = false;
+        document.getElementById('suggestions').hidden = false;
+        showView('ask');
+        input.focus();
+      } catch (error) {
+        errorBox.textContent = error.message || 'Could not start a new doubt.'; errorBox.hidden = false;
+      }
+    }
+
+    async function loadState() {
+      const query = sessionId ? `?session_id=${encodeURIComponent(sessionId)}` : '';
+      const response = await fetch(`/api/state${query}`);
+      if (!response.ok) throw new Error('Could not load your learning space.');
+      const state = await response.json();
+      sessionId = state.session_id;
+      localStorage.setItem('bhasha-session', sessionId);
+      selectedCategory = state.category || '';
+      setTopicTheme(selectedCategory);
+      renderProfile(state.profile);
+      if (state.messages.length) thread.replaceChildren();
+      state.messages.forEach((message) => addMessage(message.role, message.content, message.extras));
+      hasMessages = state.messages.length > 0;
+      if (hasMessages) document.getElementById('suggestions').hidden = true;
+    }
+
+    composer.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const message = input.value.trim();
+      if (!message || sendButton.disabled) return;
+      errorBox.hidden = true;
+      setTopicTheme(guessCategory(message));
+      addMessage('user', message);
+      hasMessages = true;
+      document.getElementById('suggestions').hidden = true;
+      input.value = '';
+      sendButton.disabled = true;
+      const typing = document.createElement('div'); typing.className = 'typing'; typing.textContent = 'Bhasha is thinking through your steps…'; thread.appendChild(typing); thread.scrollTop = thread.scrollHeight;
+      try {
+        const response = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: sessionId, message, language: languageSelect.value, category: selectedCategory }) });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Something went wrong. Try again.');
+        typing.remove();
+        sessionId = data.session_id; localStorage.setItem('bhasha-session', sessionId);
+        selectedCategory = data.category || selectedCategory;
+        setTopicTheme(selectedCategory);
+        addMessage('assistant', data.reply, data);
+        renderProfile(data.profile);
+      } catch (error) {
+        typing.remove();
+        errorBox.textContent = error.message || 'Could not connect. Try again in a moment.';
+        errorBox.hidden = false;
+      } finally {
+        sendButton.disabled = false;
+        input.focus();
+      }
+    });
+
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); composer.requestSubmit(); }
+    });
+    document.querySelectorAll('.suggestion').forEach((button) => button.addEventListener('click', () => { input.value = button.textContent; input.focus(); }));
+    document.getElementById('new-session').addEventListener('click', () => startNewSession());
+    document.getElementById('refresh-history').addEventListener('click', () => loadSessions().catch((error) => {
+      errorBox.textContent = error.message; errorBox.hidden = false;
+    }));
+
+    loadState().catch((error) => { errorBox.textContent = error.message; errorBox.hidden = false; });
+  </script>
+</body>
+</html>
