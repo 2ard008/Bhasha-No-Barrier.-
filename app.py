@@ -247,7 +247,6 @@ def generate_tutor_reply(history, profile, language, selected_category):
         data["practice_questions"] = []
     return data
 
-
 class AppHandler(BaseHTTPRequestHandler):
     def send_json(self, data, status=200):
         body = json.dumps(data, ensure_ascii=False).encode("utf-8")
@@ -400,7 +399,9 @@ class AppHandler(BaseHTTPRequestHandler):
         # Avoid logging request contents or environment values.
         return
 
-handler = AppHandler
+class handler(AppHandler):
+    pass
+    
 if __name__ == "__main__":
     load_project_env()
     if not os.environ.get("SARVAM_API_KEY"):
